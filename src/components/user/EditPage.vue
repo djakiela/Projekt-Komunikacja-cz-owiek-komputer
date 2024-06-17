@@ -1,0 +1,161 @@
+<template>
+  <div class="edit-profile">
+    <form @submit.prevent="editUsername" class="form-section">
+      <h2>Zmień nazwę użytkownika</h2>
+      <div class="form-group">
+        <label for="username">Nazwa użytkownika:</label>
+        <input type="text" id="username" v-model="username" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Zapisz Zmiany</button>
+    </form>
+    <form @submit.prevent="editPassword" class="form-section">
+      <h2>Zmień hasło</h2>
+      <div class="form-group">
+        <label for="password">Nowe hasło:</label>
+        <input type="password" id="password" v-model="password" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Zapisz Zmiany</button>
+    </form>
+  </div>
+</template>
+
+<script>
+import { ref, onMounted } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+
+export default {
+  setup() {
+    const username = ref("");
+    const password = ref("");
+    const store = useStore();
+    const router = useRouter();
+
+    const userId = store.getters.userId;
+
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/user/${userId}`);
+        const data = await response.json();
+        username.value = data.username;
+      } catch (error) {
+        console.error("Błąd podczas pobierania danych użytkownika:", error);
+      }
+    };
+
+    const editUsername = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/user/${userId}/username`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: username.value,
+            }),
+          }
+        );
+
+        if (response.ok) {
+          alert("Nazwa użytkownika zmieniona pomyślnie!");
+          router.push("/");
+        } else {
+          alert("Nie udało się zmienić nazwy użytkownika.");
+        }
+      } catch (error) {
+        console.error("Błąd podczas zmiany nazwy użytkownika:", error);
+        alert("Nie udało się zmienić nazwy użytkownika.");
+      }
+    };
+
+    const editPassword = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/user/${userId}/password`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              password: password.value,
+            }),
+          }
+        );
+
+        if (response.ok) {
+          alert("Hasło zmienione pomyślnie!");
+          router.push("/");
+        } else {
+          alert("Nie udało się zmienić hasła.");
+        }
+      } catch (error) {
+        console.error("Błąd podczas zmiany hasła:", error);
+        alert("Nie udało się zmienić hasła.");
+      }
+    };
+
+    onMounted(fetchUserProfile);
+
+    return {
+      username,
+      password,
+      editUsername,
+      editPassword,
+    };
+  },
+};
+</script>
+
+<style scoped>
+.edit-profile {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  background-color: white;
+  border-radius: 0.5rem;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #4caf50; /* Zielony kolor */
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+}
+
+.btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #388e3c;
+}
+</style>

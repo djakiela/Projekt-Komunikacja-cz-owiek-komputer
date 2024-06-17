@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from schemas import UserBase, UserDisplay, Login
+from schemas import UserBase, UserDisplay, Login, UserUpdate
 from models import User
 from database import get_db
 from hash import Hash
@@ -52,4 +52,20 @@ def get_user(id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+# Endpoint do edycji profilu użytkownika
+# Pozwala użytkownikowi na zmianę hasła i nazwy użytkownika
+@router.put("/{id}", response_model=UserDisplay)
+def update_user(id: int, request: UserUpdate, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if request.username:
+        user.username = request.username
+    if request.password:
+        user.password = Hash.bcrypt(request.password)
+    db.commit()
+    db.refresh(user)
     return user

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 class UserBase(BaseModel):
     username: str
@@ -35,3 +35,7 @@ class RecipeDisplay(RecipeBase):
 class Login(BaseModel):
     username: str
     password: str
+
+class UserUpdate(BaseModel):
+    username: Optional[str]
+    password: Optional[str]
