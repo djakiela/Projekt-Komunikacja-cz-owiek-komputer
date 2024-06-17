@@ -52,8 +52,10 @@ export default {
         if (response.ok) {
           const data = await response.json();
           console.log("Dane otrzymane po zalogowaniu:", data);
-          store.commit("setUser", data); // Ustawiamy pełne dane użytkownika
-          router.push("/test-user");
+          store.commit("setUser", data);
+          console.log("Dane użytkownika z Vuex store:", store.state.user);
+          router.push("/");
+          //router.push("/test-user");
         } else {
           showAlert.value = true;
           alertMessage.value = "Logowanie nie powiodło się. Spróbuj ponownie.";
@@ -90,7 +92,7 @@ export default {
 .login-form h1 {
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: #4caf50; /* Zielony kolor */
+  color: #4caf50;
 }
 
 .form-group {

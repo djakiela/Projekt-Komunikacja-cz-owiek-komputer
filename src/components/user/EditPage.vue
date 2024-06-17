@@ -31,7 +31,7 @@ export default {
     const store = useStore();
     const router = useRouter();
 
-    const userId = store.getters.userId;
+    const userId = store.getters.user?.id;
 
     const fetchUserProfile = async () => {
       try {
@@ -45,18 +45,15 @@ export default {
 
     const editUsername = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/user/${userId}/username`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              username: username.value,
-            }),
-          }
-        );
+        const response = await fetch(`http://localhost:8000/user/${userId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username.value,
+          }),
+        });
 
         if (response.ok) {
           alert("Nazwa użytkownika zmieniona pomyślnie!");
@@ -72,18 +69,15 @@ export default {
 
     const editPassword = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/user/${userId}/password`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              password: password.value,
-            }),
-          }
-        );
+        const response = await fetch(`http://localhost:8000/user/${userId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            password: password.value,
+          }),
+        });
 
         if (response.ok) {
           alert("Hasło zmienione pomyślnie!");

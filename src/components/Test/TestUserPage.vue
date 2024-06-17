@@ -22,8 +22,6 @@ export default {
     const store = useStore();
     const user = computed(() => store.state.user);
 
-    console.log("Dane użytkownika z Vuex store:", user.value);
-
     return {
       user,
       userId: computed(() => user.value?.id || ""),
