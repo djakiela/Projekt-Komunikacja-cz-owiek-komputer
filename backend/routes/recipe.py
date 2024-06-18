@@ -48,3 +48,16 @@ def get_recipe(id: int, db: Session = Depends(get_db), current_user: User = Depe
 def get_all_recipes(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     recipes = db.query(Recipe).filter(Recipe.owner_id == current_user.id).all()
     return recipes
+
+@router.delete("/{id}", status_code=204)
+def delete_recipe(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    recipe = db.query(Recipe).filter(Recipe.id == id, Recipe.owner_id == current_user.id).first()
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    
+    # Usuwanie składników powiązanych z przepisem
+    db.query(Ingredient).filter(Ingredient.recipe_id == id).delete()
+    
+    # Usuwanie samego przepisu
+    db.delete(recipe)
+    db.commit()

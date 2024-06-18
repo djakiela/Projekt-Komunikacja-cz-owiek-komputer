@@ -2,16 +2,19 @@
   <div id="app">
     <Header />
     <router-view />
+    <TestDeletePage />
   </div>
 </template>
 
 <script>
 import Header from "./components/common/HeaderPage.vue";
+//import TestDeletePage from "./components/Test/TestDeletePage.vue";
 
 export default {
   name: "App",
   components: {
     Header,
+    //TestDeletePage,
   },
 };
 </script>

@@ -17,7 +17,7 @@
           </button>
           <button
             class="delete-button"
-            @click="deleteRecipe(recipe)"
+            @click="confirmDelete(recipe)"
             title="Usuń przepis"
           >
             <i class="fas fa-trash"></i>
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, isProxy, toRaw } from "vue";
 
 export default {
   setup() {
@@ -38,6 +38,7 @@ export default {
     const fetchRecipes = async () => {
       try {
         const token = localStorage.getItem("token");
+        console.log("Fetching recipes with token:", token);
         const response = await fetch("http://localhost:8000/recipe", {
           headers: {
             "Content-Type": "application/json",
@@ -45,16 +46,33 @@ export default {
           },
         });
         recipes.value = await response.json();
+        console.log("Fetched recipes:", recipes.value);
       } catch (error) {
         console.error("Błąd podczas pobierania listy przepisów:", error);
       }
     };
 
-    const deleteRecipe = async (recipe) => {
+    const confirmDelete = async (recipe) => {
+      console.log("Recipe before processing:", recipe);
+      let rawRecipe = recipe;
+      if (isProxy(recipe)) {
+        rawRecipe = toRaw(recipe);
+        console.log("Recipe was a proxy. Converted to raw:", rawRecipe);
+      }
+      console.log("Confirming delete for recipe:", rawRecipe);
+      if (rawRecipe && rawRecipe.id) {
+        await deleteRecipe(rawRecipe.id);
+      } else {
+        console.error("Invalid recipe:", rawRecipe);
+      }
+    };
+
+    const deleteRecipe = async (recipeId) => {
+      console.log("Deleting recipe with ID:", recipeId);
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:8000/recipe/${recipe.id}`,
+          `http://localhost:8000/recipe/${recipeId}`,
           {
             method: "DELETE",
             headers: {
@@ -64,12 +82,11 @@ export default {
           }
         );
         if (response.ok) {
-          recipes.value = recipes.value.filter((r) => r.id !== recipe.id);
+          console.log("Recipe deleted successfully");
+          recipes.value = recipes.value.filter((r) => r.id !== recipeId);
         } else {
-          console.error(
-            "Błąd podczas usuwania przepisu:",
-            await response.json()
-          );
+          const errorData = await response.json();
+          console.error("Błąd podczas usuwania przepisu:", errorData);
         }
       } catch (error) {
         console.error("Błąd podczas usuwania przepisu:", error);
@@ -98,6 +115,7 @@ export default {
 
     return {
       recipes,
+      confirmDelete,
       deleteRecipe,
       generateShoppingList,
     };
@@ -144,7 +162,7 @@ li {
 
 .recipe-title {
   flex-grow: 1;
-  color: #000; /* Zmieniono kolor na czarny */
+  color: #000;
   text-decoration: none;
   font-size: 1.25rem;
 }
