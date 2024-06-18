@@ -1,17 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from schemas import RecipeBase, RecipeDisplay
-from models import Recipe, Ingredient
+from models import Recipe, Ingredient, User
 from database import get_db
 from typing import List
+from auth import get_current_user
 
 router = APIRouter(prefix="/recipe", tags=["recipe"])
 
 @router.post("/", response_model=RecipeDisplay)
-def create_recipe(request: RecipeBase, db: Session = Depends(get_db)):
+def create_recipe(
+    request: RecipeBase, 
+    db: Session = Depends(get_db), 
+    current_user: User = Depends(get_current_user)
+):
     new_recipe = Recipe(
         title=request.title,
         description=request.description,
+        owner_id=current_user.id
     )
     db.add(new_recipe)
     db.commit()
@@ -32,13 +38,13 @@ def create_recipe(request: RecipeBase, db: Session = Depends(get_db)):
     return new_recipe
 
 @router.get("/{id}", response_model=RecipeDisplay)
-def get_recipe(id: int, db: Session = Depends(get_db)):
-    recipe = db.query(Recipe).filter(Recipe.id == id).first()
+def get_recipe(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    recipe = db.query(Recipe).filter(Recipe.id == id, Recipe.owner_id == current_user.id).first()
     if not recipe:
         raise HTTPException(status_code=404, detail="Recipe not found")
     return recipe
 
 @router.get("/", response_model=List[RecipeDisplay])
-def get_all_recipes(db: Session = Depends(get_db)):
-    recipes = db.query(Recipe).all()
+def get_all_recipes(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    recipes = db.query(Recipe).filter(Recipe.owner_id == current_user.id).all()
     return recipes

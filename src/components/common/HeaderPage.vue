@@ -4,10 +4,10 @@
       <router-link to="/" class="navbar-item brand-title">
         Książka Kucharska Online
       </router-link>
-      <router-link to="/recipes" class="navbar-item">
-        <i class="fas fa-book"></i> Przepisy
+      <router-link v-if="isLoggedIn" to="/recipes" class="navbar-item">
+        <i class="fas fa-book"></i> Moje Przepisy
       </router-link>
-      <router-link to="/add-recipe" class="navbar-item">
+      <router-link v-if="isLoggedIn" to="/add-recipe" class="navbar-item">
         <i class="fas fa-plus"></i> Dodaj Przepis
       </router-link>
     </div>
@@ -21,22 +21,16 @@
           <i class="fas fa-user"></i>
         </a>
         <div class="navbar-dropdown is-right" v-show="isDropdownActive">
-          <router-link v-if="!currentUser" to="/login" class="navbar-item">
+          <router-link v-if="!isLoggedIn" to="/login" class="navbar-item">
             Logowanie
           </router-link>
-          <router-link v-if="!currentUser" to="/register" class="navbar-item">
+          <router-link v-if="!isLoggedIn" to="/register" class="navbar-item">
             Rejestracja
           </router-link>
-          <router-link
-            v-if="currentUser"
-            to="/edit-profile"
-            class="navbar-item"
-          >
+          <router-link v-if="isLoggedIn" to="/edit-profile" class="navbar-item">
             Edytuj Profil
           </router-link>
-          <a v-if="currentUser" class="navbar-item" @click="logout">
-            Wyloguj
-          </a>
+          <a v-if="isLoggedIn" class="navbar-item" @click="logout"> Wyloguj </a>
         </div>
       </div>
     </div>
@@ -47,7 +41,7 @@
 <script>
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import AlertPage from "./AlertPage.vue";
 
 export default {
@@ -60,6 +54,7 @@ export default {
     const alertMessage = ref("");
 
     const currentUser = computed(() => store.state.user);
+    const isLoggedIn = computed(() => !!store.state.user);
 
     const showDropdown = () => {
       isDropdownActive.value = true;
@@ -98,9 +93,35 @@ export default {
       }
     };
 
+    const fetchCurrentUser = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const response = await fetch("http://localhost:8000/auth/me", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            store.commit("setUser", data);
+          } else {
+            console.error("Nie udało się pobrać danych użytkownika.");
+          }
+        } catch (error) {
+          console.error("Błąd podczas pobierania danych użytkownika:", error);
+        }
+      }
+    };
+
+    onMounted(() => {
+      fetchCurrentUser();
+    });
+
     return {
       isDropdownActive,
       currentUser,
+      isLoggedIn,
       showDropdown,
       hideDropdown,
       logout,

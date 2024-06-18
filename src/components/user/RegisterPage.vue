@@ -1,7 +1,7 @@
 <template>
   <div class="register-form">
     <h1>Rejestracja</h1>
-    <form @submit.prevent="register">
+    <form @submit.prevent="register" class="form-container">
       <div class="form-group">
         <label for="username">Nazwa użytkownika:</label>
         <input type="text" id="username" v-model="username" required />
@@ -30,7 +30,15 @@
           <router-link to="/terms">Regulaminu</router-link>
         </label>
       </div>
-      <button type="submit" class="btn btn-primary">Zarejestruj</button>
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary">Zarejestruj</button>
+        <button @click.prevent="goBack" class="btn btn-secondary">
+          Powrót
+        </button>
+      </div>
+      <p class="login-link">
+        Masz już konto? <router-link to="/login">Zaloguj się</router-link>
+      </p>
     </form>
     <AlertPage
       v-if="showAlert"
@@ -101,6 +109,10 @@ export default {
       showAlert.value = false;
     };
 
+    const goBack = () => {
+      router.push("/");
+    };
+
     return {
       username,
       email,
@@ -111,6 +123,7 @@ export default {
       alertMessage,
       register,
       handleAlertClose,
+      goBack,
     };
   },
 };
@@ -129,7 +142,7 @@ export default {
 .register-form h1 {
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: #4caf50; /* Zielony kolor */
+  color: #4caf50;
 }
 
 .form-group {
@@ -163,6 +176,11 @@ export default {
   margin-bottom: 0;
 }
 
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
 .btn {
   background-color: #4caf50;
   color: white;
@@ -172,7 +190,30 @@ export default {
   cursor: pointer;
 }
 
+.btn-secondary {
+  background-color: #4caf50;
+}
+
 .btn:hover {
   background-color: #45a049;
+}
+
+.btn-secondary:hover {
+  background-color: #45a049;
+}
+
+.login-link {
+  margin-top: 1rem;
+  text-align: center;
+  color: #333;
+}
+
+.login-link a {
+  color: #4caf50;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
 }
 </style>

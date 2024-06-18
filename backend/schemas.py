@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
 class UserBase(BaseModel):
     username: str
     email: str
@@ -29,6 +33,7 @@ class RecipeBase(BaseModel):
 
 class RecipeDisplay(RecipeBase):
     ingredients: List[IngredientDisplay]
+    owner_id: int
 
     class Config:
         orm_mode = True
@@ -38,5 +43,7 @@ class Login(BaseModel):
     password: str
 
 class UserUpdate(BaseModel):
-    username: Optional[str]
-    password: Optional[str]
+    username: Optional[str] = None
+    password: Optional[str] = None
+
+    

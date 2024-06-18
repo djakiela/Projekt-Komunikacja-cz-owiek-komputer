@@ -4,11 +4,22 @@
     <form @submit.prevent="addRecipe">
       <div class="form-group">
         <label for="title">Tytuł:</label>
-        <input type="text" id="title" v-model="title" required />
+        <input
+          type="text"
+          id="title"
+          v-model="title"
+          class="title-input"
+          required
+        />
       </div>
       <div class="form-group">
         <label for="description">Opis:</label>
-        <textarea id="description" v-model="description" required></textarea>
+        <textarea
+          id="description"
+          v-model="description"
+          class="description-input"
+          required
+        ></textarea>
       </div>
       <div class="form-group">
         <label>Składniki:</label>
@@ -29,8 +40,22 @@
             placeholder="Ilość"
             required
           />
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="addIngredient"
+          >
+            Dodaj składnik
+          </button>
+          <button
+            type="button"
+            v-if="ingredients.length > 1"
+            class="btn btn-danger"
+            @click="removeIngredient(index)"
+          >
+            Usuń
+          </button>
         </div>
-        <button type="button" @click="addIngredient">Dodaj składnik</button>
       </div>
       <button type="submit" class="btn btn-primary">Dodaj Przepis</button>
     </form>
@@ -52,12 +77,20 @@ export default {
       ingredients.value.push({ name: "", quantity: "" });
     };
 
+    const removeIngredient = (index) => {
+      if (ingredients.value.length > 1) {
+        ingredients.value.splice(index, 1);
+      }
+    };
+
     const addRecipe = async () => {
       try {
-        const response = await fetch("http://localhost:8000/recipe", {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:8000/recipe/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             title: title.value,
@@ -70,7 +103,8 @@ export default {
           alert("Przepis dodany pomyślnie!");
           router.push("/recipes");
         } else {
-          alert("Nie udało się dodać przepisu.");
+          const errorData = await response.json();
+          alert(`Nie udało się dodać przepisu: ${errorData.detail}`);
         }
       } catch (error) {
         console.error("Błąd podczas dodawania przepisu:", error);
@@ -83,6 +117,7 @@ export default {
       description,
       ingredients,
       addIngredient,
+      removeIngredient,
       addRecipe,
     };
   },
@@ -91,7 +126,7 @@ export default {
 
 <style scoped>
 .add-recipe {
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
@@ -99,8 +134,32 @@ export default {
   border-radius: 0.5rem;
 }
 
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #4caf50;
+}
+
 .form-group {
   margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.title-input,
+.description-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+}
+
+.title-input:focus,
+.description-input:focus {
+  outline: none;
 }
 
 .ingredient-item {
@@ -109,8 +168,16 @@ export default {
   margin-bottom: 0.5rem;
 }
 
-.btn {
-  background-color: #3273dc;
+.ingredient-item input[type="text"] {
+  flex-grow: 2;
+}
+
+.ingredient-item input[type="text"]:nth-child(2) {
+  flex-grow: 1;
+}
+
+.btn-primary {
+  background-color: #4caf50;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -118,7 +185,45 @@ export default {
   cursor: pointer;
 }
 
-.btn:hover {
-  background-color: #275ba8;
+.btn-primary:hover {
+  background-color: #388e3c;
+}
+
+.btn-primary:focus {
+  outline: none;
+}
+
+.btn-secondary {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #388e3c;
+}
+
+.btn-secondary:focus {
+  outline: none;
+}
+
+.btn-danger {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background-color: #d32f2f;
+}
+
+.btn-danger:focus {
+  outline: none;
 }
 </style>

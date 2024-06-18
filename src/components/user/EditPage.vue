@@ -6,7 +6,9 @@
         <label for="username">Nazwa użytkownika:</label>
         <input type="text" id="username" v-model="username" required />
       </div>
-      <button type="submit" class="btn btn-primary">Zapisz Zmiany</button>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Zapisz Zmiany</button>
+      </div>
     </form>
     <form @submit.prevent="editPassword" class="form-section">
       <h2>Zmień hasło</h2>
@@ -14,8 +16,14 @@
         <label for="password">Nowe hasło:</label>
         <input type="password" id="password" v-model="password" required />
       </div>
-      <button type="submit" class="btn btn-primary">Zapisz Zmiany</button>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Zapisz Zmiany</button>
+        <button @click="goBack" type="button" class="btn btn-secondary">
+          Powrót
+        </button>
+      </div>
     </form>
+    <AlertPage v-if="showAlert" :message="alertMessage" @close="closeAlert" />
   </div>
 </template>
 
@@ -23,11 +31,15 @@
 import { ref, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import AlertPage from "../common/AlertPage.vue";
 
 export default {
+  components: { AlertPage },
   setup() {
     const username = ref("");
     const password = ref("");
+    const showAlert = ref(false);
+    const alertMessage = ref("");
     const store = useStore();
     const router = useRouter();
 
@@ -56,14 +68,16 @@ export default {
         });
 
         if (response.ok) {
-          alert("Nazwa użytkownika zmieniona pomyślnie!");
-          router.push("/");
+          alertMessage.value = "Nazwa użytkownika zmieniona pomyślnie!";
+          showAlert.value = true;
         } else {
-          alert("Nie udało się zmienić nazwy użytkownika.");
+          alertMessage.value = "Nie udało się zmienić nazwy użytkownika.";
+          showAlert.value = true;
         }
       } catch (error) {
         console.error("Błąd podczas zmiany nazwy użytkownika:", error);
-        alert("Nie udało się zmienić nazwy użytkownika.");
+        alertMessage.value = "Nie udało się zmienić nazwy użytkownika.";
+        showAlert.value = true;
       }
     };
 
@@ -80,15 +94,25 @@ export default {
         });
 
         if (response.ok) {
-          alert("Hasło zmienione pomyślnie!");
-          router.push("/");
+          alertMessage.value = "Hasło zmienione pomyślnie!";
+          showAlert.value = true;
         } else {
-          alert("Nie udało się zmienić hasła.");
+          alertMessage.value = "Nie udało się zmienić hasła.";
+          showAlert.value = true;
         }
       } catch (error) {
         console.error("Błąd podczas zmiany hasła:", error);
-        alert("Nie udało się zmienić hasła.");
+        alertMessage.value = "Nie udało się zmienić hasła.";
+        showAlert.value = true;
       }
+    };
+
+    const closeAlert = () => {
+      showAlert.value = false;
+    };
+
+    const goBack = () => {
+      router.push("/");
     };
 
     onMounted(fetchUserProfile);
@@ -98,6 +122,10 @@ export default {
       password,
       editUsername,
       editPassword,
+      showAlert,
+      alertMessage,
+      closeAlert,
+      goBack,
     };
   },
 };
@@ -120,7 +148,7 @@ export default {
 .form-section h2 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: #4caf50; /* Zielony kolor */
+  color: #4caf50;
 }
 
 .form-group {
@@ -140,6 +168,11 @@ export default {
   border-radius: 0.25rem;
 }
 
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
 .btn {
   background-color: #4caf50;
   color: white;
@@ -150,6 +183,15 @@ export default {
 }
 
 .btn-primary:hover {
+  background-color: #388e3c;
+}
+
+.btn-secondary {
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn-secondary:hover {
   background-color: #388e3c;
 }
 </style>

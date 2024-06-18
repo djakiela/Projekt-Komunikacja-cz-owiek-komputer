@@ -8,6 +8,7 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
+    recipes = relationship("Recipe", back_populates="owner")
 
 class Ingredient(Base):
     __tablename__ = "ingredients"
@@ -21,6 +22,8 @@ class Recipe(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     description = Column(String, index=True)
+    owner_id = Column(Integer, ForeignKey("users.id"))
     ingredients = relationship("Ingredient", back_populates="recipe")
+    owner = relationship("User", back_populates="recipes")
 
 Ingredient.recipe = relationship("Recipe", back_populates="ingredients")

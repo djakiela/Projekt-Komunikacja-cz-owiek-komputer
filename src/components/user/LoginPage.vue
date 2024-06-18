@@ -1,7 +1,7 @@
 <template>
   <div class="login-form">
     <h1>Logowanie</h1>
-    <form @submit.prevent="login">
+    <form @submit.prevent="login" class="form-container">
       <div class="form-group">
         <label for="username">Nazwa użytkownika:</label>
         <input type="text" id="username" v-model="username" required />
@@ -10,9 +10,22 @@
         <label for="password">Hasło:</label>
         <input type="password" id="password" v-model="password" required />
       </div>
-      <button type="submit" class="btn btn-primary">Zaloguj</button>
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary">Zaloguj</button>
+        <button @click.prevent="goBack" class="btn btn-secondary">
+          Powrót
+        </button>
+      </div>
+      <p class="register-link">
+        Nie masz konta?
+        <router-link to="/register">Zarejestruj się</router-link>
+      </p>
     </form>
-    <AlertPage v-if="showAlert" :message="alertMessage" @close="closeAlert" />
+    <AlertPage
+      v-if="showAlert"
+      :message="alertMessage"
+      @close="handleAlertClose"
+    />
   </div>
 </template>
 
@@ -23,27 +36,25 @@ import { ref } from "vue";
 import AlertPage from "../common/AlertPage.vue";
 
 export default {
-  components: { AlertPage },
+  components: {
+    AlertPage,
+  },
   setup() {
     const username = ref("");
     const password = ref("");
     const showAlert = ref(false);
     const alertMessage = ref("");
-    const store = useStore();
     const router = useRouter();
-
-    const closeAlert = () => {
-      showAlert.value = false;
-    };
+    const store = useStore();
 
     const login = async () => {
       try {
-        const response = await fetch("http://localhost:8000/user/login", {
+        const response = await fetch("http://localhost:8000/auth/token", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: JSON.stringify({
+          body: new URLSearchParams({
             username: username.value,
             password: password.value,
           }),
@@ -51,29 +62,52 @@ export default {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Dane otrzymane po zalogowaniu:", data);
-          store.commit("setUser", data);
-          console.log("Dane użytkownika z Vuex store:", store.state.user);
-          router.push("/");
-          //router.push("/test-user");
+          const token = data.access_token;
+          store.commit("setToken", token);
+
+          // Pobranie danych użytkownika
+          const userResponse = await fetch("http://localhost:8000/auth/me", {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            store.commit("setUser", userData);
+            router.push("/");
+          } else {
+            throw new Error("Nie udało się pobrać danych użytkownika.");
+          }
         } else {
+          const errorData = await response.json();
+          alertMessage.value = `Logowanie nie powiodło się: ${errorData.detail}`;
           showAlert.value = true;
-          alertMessage.value = "Logowanie nie powiodło się. Spróbuj ponownie.";
         }
       } catch (error) {
         console.error("Błąd podczas logowania:", error);
+        alertMessage.value = "Logowanie nie powiodło się.";
         showAlert.value = true;
-        alertMessage.value = "Błąd podczas logowania. Spróbuj ponownie.";
       }
+    };
+
+    const handleAlertClose = () => {
+      showAlert.value = false;
+    };
+
+    const goBack = () => {
+      router.push("/");
     };
 
     return {
       username,
       password,
-      login,
       showAlert,
       alertMessage,
-      closeAlert,
+      login,
+      handleAlertClose,
+      goBack,
     };
   },
 };
@@ -102,14 +136,19 @@ export default {
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #333;
 }
 
-.form-group input {
+.form-group input[type="text"],
+.form-group input[type="password"] {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 0.25rem;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
 }
 
 .btn {
@@ -121,7 +160,30 @@ export default {
   cursor: pointer;
 }
 
-.btn-primary:hover {
-  background-color: #388e3c;
+.btn-secondary {
+  background-color: #4caf50;
+}
+
+.btn:hover {
+  background-color: #45a049;
+}
+
+.btn-secondary:hover {
+  background-color: #45a049;
+}
+
+.register-link {
+  margin-top: 1rem;
+  text-align: center;
+  color: #333;
+}
+
+.register-link a {
+  color: #4caf50;
+  text-decoration: none;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
 }
 </style>
