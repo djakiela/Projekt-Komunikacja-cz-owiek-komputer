@@ -191,7 +191,7 @@ export default {
 }
 
 .btn-secondary {
-  background-color: #4caf50;
+  background-color: #6c757d;
 }
 
 .btn:hover {
@@ -199,7 +199,7 @@ export default {
 }
 
 .btn-secondary:hover {
-  background-color: #45a049;
+  background-color: #5a6268;
 }
 
 .login-link {

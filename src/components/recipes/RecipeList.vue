@@ -1,6 +1,9 @@
 <template>
   <div class="recipe-list">
-    <h1>Lista Przepisów</h1>
+    <div class="header">
+      <h1>Lista Przepisów</h1>
+      <button @click="goBack" class="btn btn-secondary">Powrót</button>
+    </div>
     <ul>
       <li v-for="(recipe, index) in recipes" :key="index">
         <span class="recipe-index">{{ index + 1 }}.</span>
@@ -30,10 +33,12 @@
 
 <script>
 import { ref, onMounted, isProxy, toRaw } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
     const recipes = ref([]);
+    const router = useRouter();
 
     const fetchRecipes = async () => {
       try {
@@ -111,6 +116,10 @@ export default {
       URL.revokeObjectURL(url);
     };
 
+    const goBack = () => {
+      router.push("/");
+    };
+
     onMounted(fetchRecipes);
 
     return {
@@ -118,6 +127,7 @@ export default {
       confirmDelete,
       deleteRecipe,
       generateShoppingList,
+      goBack,
     };
   },
 };
@@ -131,6 +141,12 @@ export default {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
   background-color: white;
   border-radius: 0.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 h1 {

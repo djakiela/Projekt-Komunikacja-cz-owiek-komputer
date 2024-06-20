@@ -1,6 +1,9 @@
 <template>
   <div class="add-recipe">
-    <h1>Dodaj Przepis</h1>
+    <div class="header">
+      <h1>Dodaj Przepis</h1>
+      <button @click="goBack" class="btn btn-secondary">Powrót</button>
+    </div>
     <form @submit.prevent="addRecipe">
       <div class="form-group">
         <label for="title">Tytuł:</label>
@@ -40,11 +43,7 @@
             placeholder="Ilość"
             required
           />
-          <button
-            type="button"
-            class="btn btn-secondary"
-            @click="addIngredient"
-          >
+          <button type="button" class="btn btn-success" @click="addIngredient">
             Dodaj składnik
           </button>
           <button
@@ -112,6 +111,10 @@ export default {
       }
     };
 
+    const goBack = () => {
+      router.push("/");
+    };
+
     return {
       title,
       description,
@@ -119,6 +122,7 @@ export default {
       addIngredient,
       removeIngredient,
       addRecipe,
+      goBack,
     };
   },
 };
@@ -132,6 +136,12 @@ export default {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
   background-color: white;
   border-radius: 0.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 h1 {
@@ -194,7 +204,7 @@ h1 {
 }
 
 .btn-secondary {
-  background-color: #4caf50;
+  background-color: #6c757d;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -203,10 +213,27 @@ h1 {
 }
 
 .btn-secondary:hover {
-  background-color: #388e3c;
+  background-color: #5a6268;
 }
 
 .btn-secondary:focus {
+  outline: none;
+}
+
+.btn-success {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-success:hover {
+  background-color: #388e3c;
+}
+
+.btn-success:focus {
   outline: none;
 }
 

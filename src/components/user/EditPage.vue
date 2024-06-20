@@ -187,11 +187,11 @@ export default {
 }
 
 .btn-secondary {
-  background-color: #4caf50;
+  background-color: #6c757d;
   color: white;
 }
 
 .btn-secondary:hover {
-  background-color: #388e3c;
+  background-color: #5a6268;
 }
 </style>

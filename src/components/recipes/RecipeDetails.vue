@@ -1,9 +1,14 @@
 <template>
   <div class="recipe-details">
-    <h1 v-if="recipe">{{ recipe.title }}</h1>
-    <p v-if="recipe">{{ recipe.description }}</p>
+    <div class="header">
+      <h1 v-if="recipe">{{ recipe.title }}</h1>
+      <button @click="goBack" class="btn btn-secondary">Powrót</button>
+    </div>
+    <div class="description" v-if="recipe">
+      <p>{{ recipe.description }}</p>
+    </div>
     <h3 v-if="recipe">Składniki</h3>
-    <ul v-if="recipe">
+    <ul v-if="recipe" class="ingredients-list">
       <li v-for="(ingredient, index) in recipe.ingredients" :key="index">
         {{ ingredient.name }} - {{ ingredient.quantity }}
       </li>
@@ -79,12 +84,17 @@ export default {
       router.push(`/edit-recipe/${recipe.value.id}`);
     };
 
+    const goBack = () => {
+      router.push("/recipes");
+    };
+
     onMounted(fetchRecipe);
 
     return {
       recipe,
       error,
       editRecipe,
+      goBack,
     };
   },
 };
@@ -92,12 +102,33 @@ export default {
 
 <style scoped>
 .recipe-details {
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 800px;
+  margin: 2rem auto;
   padding: 2rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
   background-color: white;
   border-radius: 0.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.description {
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+}
+
+.ingredients-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.ingredients-list li {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
 }
 
 .btn {
@@ -111,5 +142,32 @@ export default {
 
 .btn:hover {
   background-color: #275ba8;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-primary {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.btn-primary:hover {
+  background-color: #388e3c;
 }
 </style>
