@@ -61,3 +61,11 @@ def delete_recipe(id: int, db: Session = Depends(get_db), current_user: User = D
     # Usuwanie samego przepisu
     db.delete(recipe)
     db.commit()
+
+@router.get("/test/{id}", response_model=RecipeDisplay)
+def test_get_recipe(id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    recipe = db.query(Recipe).filter(Recipe.id == id, Recipe.owner_id == current_user.id).first()
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    return recipe
+

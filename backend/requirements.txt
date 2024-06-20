@@ -5,4 +5,4 @@ passlib
 bcrypt
 typing
 
-uvicorn main:app --reload
+# Odpalenie backednu - uvicorn main:app --reload

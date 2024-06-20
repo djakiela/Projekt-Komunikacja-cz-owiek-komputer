@@ -58,11 +58,9 @@ export default {
       if (isProxy(recipe)) {
         rawRecipe = toRaw(recipe);
         console.log("Recipe was a proxy. Converted to raw:", rawRecipe);
-      } else {
-        console.log("Recipe is not a proxy:", rawRecipe);
       }
+      console.log("Confirming delete for recipe:", rawRecipe);
       if (rawRecipe && rawRecipe.id) {
-        console.log("Valid recipe ID found:", rawRecipe.id);
         await deleteRecipe(rawRecipe.id);
       } else {
         console.error("Invalid recipe:", rawRecipe);
@@ -73,7 +71,6 @@ export default {
       console.log("Deleting recipe with ID:", recipeId);
       try {
         const token = localStorage.getItem("token");
-        console.log("Token for delete request:", token);
         const response = await fetch(
           `http://localhost:8000/recipe/${recipeId}`,
           {
@@ -165,7 +162,7 @@ li {
 
 .recipe-title {
   flex-grow: 1;
-  color: #000; /* Zmieniono kolor na czarny */
+  color: #000;
   text-decoration: none;
   font-size: 1.25rem;
 }
