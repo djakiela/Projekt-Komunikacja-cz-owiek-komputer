@@ -65,7 +65,6 @@ export default {
           const token = data.access_token;
           store.commit("setToken", token);
 
-          // Pobranie danych użytkownika
           const userResponse = await fetch("http://localhost:8000/auth/me", {
             headers: {
               "Content-Type": "application/json",

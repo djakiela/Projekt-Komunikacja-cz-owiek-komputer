@@ -139,7 +139,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background-color: #4caf50; /* Zielony kolor tła */
+  background-color: #4caf50;
 }
 
 .navbar-brand {
