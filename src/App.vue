@@ -10,14 +10,14 @@
 <script>
 import Header from "./components/common/HeaderPage.vue";
 //import TestDeletePage from "./components/Test/TestDeletePage.vue";
-import TestIDComponent from "./components/Test/TestIDComponent.vue";
+//import TestIDComponent from "./components/Test/TestIDComponent.vue";
 
 export default {
   name: "App",
   components: {
     Header,
     //TestDeletePage,
-    TestIDComponent,
+    //TestIDComponent,
   },
 };
 </script>

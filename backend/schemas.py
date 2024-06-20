@@ -32,6 +32,7 @@ class RecipeBase(BaseModel):
     ingredients: List[IngredientBase]
 
 class RecipeDisplay(RecipeBase):
+    id: int
     ingredients: List[IngredientDisplay]
     owner_id: int
 

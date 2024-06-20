@@ -3,7 +3,7 @@ import { createStore } from "vuex";
 const store = createStore({
   state: {
     user: null,
-    token: null,
+    token: localStorage.getItem("token") || null,
   },
   mutations: {
     setUser(state, user) {
