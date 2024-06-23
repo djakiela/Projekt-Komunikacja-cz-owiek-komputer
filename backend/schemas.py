@@ -49,6 +49,12 @@ class RecipeDisplay(RecipeBase):
     class Config:
         orm_mode = True
 
+class RecipeUpdate(BaseModel):
+    title: str
+    description: Optional[str]
+    ingredients: List[IngredientBase]
+    steps: List[StepBase]
+
 class Login(BaseModel):
     username: str
     password: str

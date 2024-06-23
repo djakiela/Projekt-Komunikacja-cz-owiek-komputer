@@ -83,6 +83,7 @@ import { useRouter, useRoute } from "vue-router";
 export default {
   setup() {
     const title = ref("");
+    const description = ref("");
     const ingredients = ref([{ name: "", quantity: "" }]);
     const steps = ref([{ description: "" }]);
     const router = useRouter();
@@ -101,6 +102,7 @@ export default {
         );
         const data = await response.json();
         title.value = data.title;
+        description.value = data.description;
         ingredients.value = data.ingredients;
         steps.value = data.steps;
       } catch (error) {
@@ -141,6 +143,7 @@ export default {
             },
             body: JSON.stringify({
               title: title.value,
+              description: description.value,
               ingredients: ingredients.value,
               steps: steps.value,
             }),
@@ -172,6 +175,7 @@ export default {
 
     return {
       title,
+      description,
       ingredients,
       steps,
       addIngredient,
