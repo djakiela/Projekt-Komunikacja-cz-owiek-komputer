@@ -10,6 +10,13 @@
       <router-link v-if="isLoggedIn" to="/add-recipe" class="navbar-item">
         <i class="fas fa-plus"></i> Dodaj Przepis
       </router-link>
+      <router-link
+        v-if="isLoggedIn && currentUser.role === 'admin'"
+        to="/admin/add-recipe"
+        class="navbar-item"
+      >
+        <i class="fas fa-user-shield"></i> Admin
+      </router-link>
     </div>
     <div class="navbar-end">
       <div

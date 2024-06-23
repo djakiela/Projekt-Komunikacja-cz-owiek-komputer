@@ -14,7 +14,12 @@
       </div>
     </div>
     <div class="description" v-if="recipe">
-      <p>{{ recipe.description }}</p>
+      <h3>Kroki</h3>
+      <ol>
+        <li v-for="(step, index) in recipe.steps" :key="index">
+          {{ step.description }}
+        </li>
+      </ol>
     </div>
     <h3 v-if="recipe">Składniki</h3>
     <ul v-if="recipe" class="ingredients-list">

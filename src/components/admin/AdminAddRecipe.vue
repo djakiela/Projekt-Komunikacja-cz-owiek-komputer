@@ -1,7 +1,7 @@
 <template>
   <div class="add-recipe">
     <div class="header">
-      <h1>Dodaj Przepis</h1>
+      <h1>Dodaj Przepis (Admin)</h1>
       <button @click="goBack" class="btn btn-secondary">Powrót</button>
     </div>
     <form @submit.prevent="addRecipe">
@@ -14,6 +14,26 @@
           class="title-input"
           required
         />
+      </div>
+      <div class="form-group">
+        <label for="category">Kategoria:</label>
+        <select
+          id="category"
+          v-model="category"
+          class="category-select"
+          required
+        >
+          <option value="Śniadanie">Śniadanie</option>
+          <option value="Ciasta">Ciasta</option>
+          <option value="Kolacja">Kolacja</option>
+          <option value="Grill">Grill</option>
+          <option value="Obiad">Obiad</option>
+          <option value="Makarony">Makarony</option>
+          <option value="Polska kuchnia">Polska kuchnia</option>
+          <option value="Sałatki">Sałatki</option>
+          <option value="Zupy">Zupy</option>
+          <option value="Kuchnie świata">Kuchnie świata</option>
+        </select>
       </div>
       <div class="form-group">
         <label>Składniki:</label>
@@ -34,17 +54,13 @@
             placeholder="Ilość"
             required
           />
-          <button
-            type="button"
-            class="btn btn-success btn-small"
-            @click="addIngredient"
-          >
+          <button type="button" class="btn btn-success" @click="addIngredient">
             Dodaj składnik
           </button>
           <button
             type="button"
             v-if="ingredients.length > 1"
-            class="btn btn-danger btn-small"
+            class="btn btn-danger"
             @click="removeIngredient(index)"
           >
             Usuń
@@ -56,21 +72,16 @@
         <div v-for="(step, index) in steps" :key="index" class="step-item">
           <textarea
             v-model="step.description"
-            @input="adjustTextareaHeight($event)"
             placeholder="Opis kroku"
             required
           ></textarea>
-          <button
-            type="button"
-            class="btn btn-success btn-small"
-            @click="addStep"
-          >
+          <button type="button" class="btn btn-success" @click="addStep">
             Dodaj krok
           </button>
           <button
             type="button"
             v-if="steps.length > 1"
-            class="btn btn-danger btn-small"
+            class="btn btn-danger"
             @click="removeStep(index)"
           >
             Usuń
@@ -89,6 +100,7 @@ import { useRouter } from "vue-router";
 export default {
   setup() {
     const title = ref("");
+    const category = ref("");
     const ingredients = ref([{ name: "", quantity: "" }]);
     const steps = ref([{ description: "" }]);
     const router = useRouter();
@@ -116,7 +128,7 @@ export default {
     const addRecipe = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:8000/recipe/", {
+        const response = await fetch("http://localhost:8000/recipe/admin", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -124,6 +136,7 @@ export default {
           },
           body: JSON.stringify({
             title: title.value,
+            category: category.value,
             ingredients: ingredients.value,
             steps: steps.value,
           }),
@@ -145,14 +158,9 @@ export default {
       router.push("/");
     };
 
-    const adjustTextareaHeight = (event) => {
-      const textarea = event.target;
-      textarea.style.height = "auto";
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    };
-
     return {
       title,
+      category,
       ingredients,
       steps,
       addIngredient,
@@ -161,7 +169,6 @@ export default {
       removeStep,
       addRecipe,
       goBack,
-      adjustTextareaHeight,
     };
   },
 };
@@ -199,8 +206,9 @@ h1 {
 }
 
 .title-input,
-.description-input,
-.step-input {
+.category-select,
+.ingredient-item input[type="text"],
+.step-item textarea {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid #ccc;
@@ -212,24 +220,6 @@ h1 {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
-  align-items: center;
-}
-
-.ingredient-item input[type="text"],
-.step-item textarea {
-  flex-grow: 2;
-  height: 2.5rem;
-}
-
-.step-item textarea {
-  height: auto;
-  min-height: 2rem;
-  padding: 0.25rem;
-  resize: none;
-}
-
-.ingredient-item input[type="text"]:nth-child(2) {
-  flex-grow: 1;
 }
 
 .btn-primary {
@@ -254,35 +244,21 @@ h1 {
   cursor: pointer;
 }
 
-.btn-secondary:hover {
-  background-color: #5a6268;
-}
-
 .btn-success {
   background-color: #4caf50;
   color: white;
   border: none;
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem 1rem;
   border-radius: 0.25rem;
   cursor: pointer;
-  font-size: 0.875rem;
-}
-
-.btn-success:hover {
-  background-color: #388e3c;
 }
 
 .btn-danger {
   background-color: #f44336;
   color: white;
   border: none;
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem 1rem;
   border-radius: 0.25rem;
   cursor: pointer;
-  font-size: 0.875rem;
-}
-
-.btn-danger:hover {
-  background-color: #d32f2f;
 }
 </style>

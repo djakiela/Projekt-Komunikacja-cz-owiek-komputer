@@ -14,6 +14,7 @@ class UserDisplay(BaseModel):
     id: int
     username: str
     email: str
+    role: str
 
     class Config:
         orm_mode = True
@@ -26,14 +27,23 @@ class IngredientDisplay(IngredientBase):
     class Config:
         orm_mode = True
 
+class StepBase(BaseModel):
+    description: str
+
+class StepDisplay(StepBase):
+    class Config:
+        orm_mode = True
+
 class RecipeBase(BaseModel):
     title: str
-    description: str
+    description: Optional[str] = None
     ingredients: List[IngredientBase]
+    steps: List[StepBase]
 
 class RecipeDisplay(RecipeBase):
     id: int
     ingredients: List[IngredientDisplay]
+    steps: List[StepDisplay]
     owner_id: int
 
     class Config:

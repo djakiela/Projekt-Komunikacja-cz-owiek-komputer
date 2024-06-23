@@ -19,6 +19,7 @@ import PolishPage from "./components/recipeshome/PolishPage.vue";
 import SaladsPage from "./components/recipeshome/SaladsPage.vue";
 import SoupsPage from "./components/recipeshome/SoupsPage.vue";
 import WorldPage from "./components/recipeshome/WorldPage.vue";
+import AdminAddRecipePage from "./components/admin/AdminAddRecipe.vue";
 
 const routes = [
   { path: "/", component: HomePage },
@@ -46,6 +47,7 @@ const routes = [
   { path: "/salads", component: SaladsPage },
   { path: "/soups", component: SoupsPage },
   { path: "/world", component: WorldPage },
+  { path: "/admin/add-recipe", component: AdminAddRecipePage },
 ];
 
 const router = createRouter({

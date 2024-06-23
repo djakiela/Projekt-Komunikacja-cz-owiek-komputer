@@ -5,6 +5,7 @@
         <img :src="image" :alt="title" />
       </div>
       <h2>{{ title }}</h2>
+      <p>{{ description }}</p>
     </router-link>
   </div>
 </template>
@@ -14,6 +15,10 @@ export default {
   name: "CategoryTile",
   props: {
     title: {
+      type: String,
+      required: true,
+    },
+    description: {
       type: String,
       required: true,
     },
@@ -31,19 +36,24 @@ export default {
 
 <style scoped>
 .category-tile {
-  width: 200px;
+  width: 220px;
   margin: 10px;
   text-align: center;
-  transition: transform 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border-radius: 15px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .category-tile:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .image-container {
-  width: 200px;
-  height: 200px;
+  width: 220px;
+  height: 220px;
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -54,13 +64,20 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 10px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
 }
 
 .category-tile h2 {
   margin-top: 10px;
-  font-size: 18px;
+  font-size: 1.2rem;
   color: #333;
+}
+
+.category-tile p {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  color: #777;
 }
 
 .category-tile a {
