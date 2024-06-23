@@ -28,17 +28,30 @@
         </div>
       </li>
     </ul>
+    <alert-recipe
+      v-if="showAlert"
+      :message="alertMessage"
+      @confirm="deleteRecipe"
+      @cancel="showAlert = false"
+    />
   </div>
 </template>
 
 <script>
 import { ref, onMounted, isProxy, toRaw } from "vue";
 import { useRouter } from "vue-router";
+import AlertRecipe from "../common/AlertRecipe.vue";
 
 export default {
+  components: {
+    AlertRecipe,
+  },
   setup() {
     const recipes = ref([]);
     const router = useRouter();
+    const showAlert = ref(false);
+    const alertMessage = ref("");
+    const recipeToDelete = ref(null);
 
     const fetchRecipes = async () => {
       try {
@@ -57,27 +70,24 @@ export default {
       }
     };
 
-    const confirmDelete = async (recipe) => {
+    const confirmDelete = (recipe) => {
       console.log("Recipe before processing:", recipe);
       let rawRecipe = recipe;
       if (isProxy(recipe)) {
         rawRecipe = toRaw(recipe);
         console.log("Recipe was a proxy. Converted to raw:", rawRecipe);
       }
-      console.log("Confirming delete for recipe:", rawRecipe);
-      if (rawRecipe && rawRecipe.id) {
-        await deleteRecipe(rawRecipe.id);
-      } else {
-        console.error("Invalid recipe:", rawRecipe);
-      }
+      recipeToDelete.value = rawRecipe;
+      alertMessage.value = "Czy na pewno usunąć przepis?";
+      showAlert.value = true;
     };
 
-    const deleteRecipe = async (recipeId) => {
-      console.log("Deleting recipe with ID:", recipeId);
+    const deleteRecipe = async () => {
+      console.log("Deleting recipe with ID:", recipeToDelete.value.id);
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:8000/recipe/${recipeId}`,
+          `http://localhost:8000/recipe/${recipeToDelete.value.id}`,
           {
             method: "DELETE",
             headers: {
@@ -88,13 +98,18 @@ export default {
         );
         if (response.ok) {
           console.log("Recipe deleted successfully");
-          recipes.value = recipes.value.filter((r) => r.id !== recipeId);
+          recipes.value = recipes.value.filter(
+            (r) => r.id !== recipeToDelete.value.id
+          );
+          showAlert.value = false;
         } else {
           const errorData = await response.json();
           console.error("Błąd podczas usuwania przepisu:", errorData);
+          alert(`Nie udało się usunąć przepisu: ${errorData.detail}`);
         }
       } catch (error) {
         console.error("Błąd podczas usuwania przepisu:", error);
+        alert("Wystąpił błąd podczas usuwania przepisu.");
       }
     };
 
@@ -128,6 +143,8 @@ export default {
       deleteRecipe,
       generateShoppingList,
       goBack,
+      showAlert,
+      alertMessage,
     };
   },
 };

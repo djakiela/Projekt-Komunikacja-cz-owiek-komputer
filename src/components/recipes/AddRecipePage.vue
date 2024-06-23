@@ -58,19 +58,30 @@
       </div>
       <button type="submit" class="btn btn-primary">Dodaj Przepis</button>
     </form>
+    <alert-page
+      v-if="showAlert"
+      :message="alertMessage"
+      @close="handleAlertClose"
+    />
   </div>
 </template>
 
 <script>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import AlertPage from "../common/AlertPage.vue";
 
 export default {
+  components: {
+    AlertPage,
+  },
   setup() {
     const title = ref("");
     const description = ref("");
     const ingredients = ref([{ name: "", quantity: "" }]);
     const router = useRouter();
+    const showAlert = ref(false);
+    const alertMessage = ref("");
 
     const addIngredient = () => {
       ingredients.value.push({ name: "", quantity: "" });
@@ -99,8 +110,8 @@ export default {
         });
 
         if (response.ok) {
-          alert("Przepis dodany pomyślnie!");
-          router.push("/recipes");
+          alertMessage.value = "Przepis dodany pomyślnie!";
+          showAlert.value = true;
         } else {
           const errorData = await response.json();
           alert(`Nie udało się dodać przepisu: ${errorData.detail}`);
@@ -115,6 +126,11 @@ export default {
       router.push("/");
     };
 
+    const handleAlertClose = () => {
+      showAlert.value = false;
+      router.push("/recipes");
+    };
+
     return {
       title,
       description,
@@ -123,6 +139,9 @@ export default {
       removeIngredient,
       addRecipe,
       goBack,
+      showAlert,
+      alertMessage,
+      handleAlertClose,
     };
   },
 };

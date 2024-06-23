@@ -80,13 +80,14 @@ export default {
             throw new Error("Nie udało się pobrać danych użytkownika.");
           }
         } else {
-          const errorData = await response.json();
-          alertMessage.value = `Logowanie nie powiodło się: ${errorData.detail}`;
+          alertMessage.value =
+            "Logowanie nie powiodło się: Niepoprawne hasło lub nazwa użytkownika";
           showAlert.value = true;
         }
       } catch (error) {
         console.error("Błąd podczas logowania:", error);
-        alertMessage.value = "Logowanie nie powiodło się.";
+        alertMessage.value =
+          "Logowanie nie powiodło się: Niepoprawne hasło lub nazwa użytkownika";
         showAlert.value = true;
       }
     };

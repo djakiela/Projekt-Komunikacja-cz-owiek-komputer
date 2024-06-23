@@ -2,7 +2,16 @@
   <div class="recipe-details">
     <div class="header">
       <h1 v-if="recipe">{{ recipe.title }}</h1>
-      <button @click="goBack" class="btn btn-secondary">Powrót</button>
+      <div class="buttons">
+        <button @click="goBack" class="btn btn-secondary">Powrót</button>
+        <button
+          @click="confirmDelete"
+          class="delete-button"
+          title="Usuń przepis"
+        >
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
     </div>
     <div class="description" v-if="recipe">
       <p>{{ recipe.description }}</p>
@@ -18,6 +27,12 @@
     </button>
     <p v-else>Ładowanie danych przepisu...</p>
     <p v-if="error">{{ error }}</p>
+    <alert-recipe
+      v-if="showAlert"
+      :message="alertMessage"
+      @confirm="deleteRecipe"
+      @cancel="showAlert = false"
+    />
   </div>
 </template>
 
@@ -25,8 +40,12 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
+import AlertRecipe from "../common/AlertRecipe.vue";
 
 export default {
+  components: {
+    AlertRecipe,
+  },
   setup() {
     const recipe = ref(null);
     const error = ref(null);
@@ -34,6 +53,8 @@ export default {
     const router = useRouter();
     const store = useStore();
     const recipeId = ref(null);
+    const showAlert = ref(false);
+    const alertMessage = ref("");
 
     const fetchRecipe = async () => {
       try {
@@ -88,6 +109,37 @@ export default {
       router.push("/recipes");
     };
 
+    const confirmDelete = () => {
+      alertMessage.value = "Czy na pewno usunąć przepis?";
+      showAlert.value = true;
+    };
+
+    const deleteRecipe = async () => {
+      try {
+        const token = store.getters.token;
+        const response = await fetch(
+          `http://localhost:8000/recipe/${recipeId.value}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          router.push("/recipes");
+        } else {
+          const errorData = await response.json();
+          alert(`Nie udało się usunąć przepisu: ${errorData.detail}`);
+        }
+      } catch (error) {
+        console.error("Błąd podczas usuwania przepisu:", error);
+        alert("Wystąpił błąd podczas usuwania przepisu.");
+      }
+    };
+
     onMounted(fetchRecipe);
 
     return {
@@ -95,6 +147,10 @@ export default {
       error,
       editRecipe,
       goBack,
+      confirmDelete,
+      deleteRecipe,
+      showAlert,
+      alertMessage,
     };
   },
 };
@@ -114,6 +170,11 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .description {
@@ -169,5 +230,31 @@ export default {
 
 .btn-primary:hover {
   background-color: #388e3c;
+}
+
+.btn-danger {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background-color: #d32f2f;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  position: relative;
+  color: #000;
+}
+
+.delete-button:hover i {
+  color: #ff4d4f;
 }
 </style>
